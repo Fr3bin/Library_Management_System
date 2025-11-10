@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { LibraryService } from '../services/library.service';
 import { SearchBooksComponent } from '../search-books/search-books.component';
 import { BorrowingHistoryComponent } from '../borrowing-history/borrowing-history.component';
@@ -12,6 +13,7 @@ import { BorrowingHistoryComponent } from '../borrowing-history/borrowing-histor
 })
 export class MemberPortalComponent {
   private libraryService = inject(LibraryService);
+  private router = inject(Router);
   
   member = this.libraryService.getMember();
   stats = this.libraryService.getStats();
@@ -28,8 +30,8 @@ export class MemberPortalComponent {
   }
 
   logout() {
-    console.log('Logout clicked');
-    // Implement logout logic
+    // Navigate back to the login page
+    this.router.navigate(['/']);
   }
 
   formatDate(date: Date): string {

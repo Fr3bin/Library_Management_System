@@ -8,3 +8,16 @@ export interface LibraryMember {
   overdue: number;
   status: 'Active' | 'Inactive';
 }
+
+export interface BorrowingRecord {
+  bookId: string;
+  borrowDate: Date;
+  dueDate: Date;
+  returnDate: Date | null;
+  status: 'Overdue' | 'Returned' | 'Borrowed';
+}
+
+export interface MemberDetails extends LibraryMember {
+  borrowingHistory: BorrowingRecord[];
+  returned: number;
+}

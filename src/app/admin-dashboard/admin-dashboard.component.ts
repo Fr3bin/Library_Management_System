@@ -34,6 +34,15 @@ export class AdminDashboardComponent {
 
   handleQuickAction(action: any) {
     console.log('Quick action clicked:', action.title);
-    // TODO: Implement navigation or action
+    if (action.title === 'Add New Book') {
+      this.setActiveTab('manage-books');
+      // Trigger the add book modal after a brief delay to ensure tab switch
+      setTimeout(() => {
+        const event = new CustomEvent('openAddBookModal');
+        window.dispatchEvent(event);
+      }, 100);
+    } else if (action.title === 'Manage Users') {
+      this.setActiveTab('manage-users');
+    }
   }
 }

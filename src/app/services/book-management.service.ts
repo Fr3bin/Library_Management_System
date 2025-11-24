@@ -72,6 +72,45 @@ export class BookManagementService {
     return this.booksData.asReadonly();
   }
 
+  addBook(bookData: { title: string; author: string; isbn: string; category: string; totalCopies: number }) {
+    const newBook: BookManagement = {
+      id: (this.booksData().length + 1).toString(),
+      title: bookData.title,
+      author: bookData.author,
+      category: bookData.category,
+      isbn: bookData.isbn,
+      availability: 'Available',
+      totalCopies: bookData.totalCopies,
+      availableCopies: bookData.totalCopies
+    };
+
+    this.booksData.update(books => [...books, newBook]);
+  }
+
+  updateBook(bookId: string, bookData: { title: string; author: string; isbn: string; category: string; totalCopies: number }) {
+    this.booksData.update(books => 
+      books.map(book => {
+        if (book.id === bookId) {
+          // Calculate the difference in total copies
+          const copyDifference = bookData.totalCopies - book.totalCopies;
+          const newAvailableCopies = book.availableCopies + copyDifference;
+          
+          return {
+            ...book,
+            title: bookData.title,
+            author: bookData.author,
+            isbn: bookData.isbn,
+            category: bookData.category,
+            totalCopies: bookData.totalCopies,
+            availableCopies: Math.max(0, newAvailableCopies),
+            availability: newAvailableCopies > 0 ? 'Available' : 'Unavailable'
+          };
+        }
+        return book;
+      })
+    );
+  }
+
   deleteBook(bookId: string) {
     this.booksData.update(books => books.filter(book => book.id !== bookId));
   }

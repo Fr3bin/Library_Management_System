@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserManagementService } from '../services/user-management.service';
+import { MemberDetails } from '../models/user-management.models';
 
 @Component({
   selector: 'app-manage-users',
@@ -15,6 +16,8 @@ export class ManageUsersComponent {
 
   members = this.userManagementService.getAllMembers();
   searchQuery = signal('');
+  showDetailsModal = signal(false);
+  selectedMemberDetails = signal<MemberDetails | null>(null);
 
   filteredMembers = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -33,7 +36,16 @@ export class ManageUsersComponent {
   }
 
   viewDetails(memberId: string) {
-    this.userManagementService.viewMemberDetails(memberId);
+    const details = this.userManagementService.getMemberDetails(memberId);
+    if (details) {
+      this.selectedMemberDetails.set(details);
+      this.showDetailsModal.set(true);
+    }
+  }
+
+  closeDetailsModal() {
+    this.showDetailsModal.set(false);
+    this.selectedMemberDetails.set(null);
   }
 
   formatDate(date: Date): string {

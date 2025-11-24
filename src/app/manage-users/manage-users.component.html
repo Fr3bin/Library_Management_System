@@ -112,4 +112,110 @@
       </table>
     </div>
   </div>
+
+  <!-- User Details Modal -->
+  @if (showDetailsModal() && selectedMemberDetails()) {
+    <div class="modal-overlay" (click)="closeDetailsModal()">
+      <div class="modal-content user-details-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>User Details</h2>
+            <p class="modal-subtitle">Detailed information about {{ selectedMemberDetails()!.name }}</p>
+          </div>
+          <button class="close-button" (click)="closeDetailsModal()" aria-label="Close modal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="details-grid">
+            <!-- Profile Information -->
+            <div class="info-card">
+              <h3>Profile Information</h3>
+              <div class="info-row">
+                <span class="info-label">Name:</span>
+                <span class="info-value">{{ selectedMemberDetails()!.name }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ selectedMemberDetails()!.email }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Member Since:</span>
+                <span class="info-value">{{ formatDate(selectedMemberDetails()!.memberSince) }}</span>
+              </div>
+            </div>
+
+            <!-- Borrowing Statistics -->
+            <div class="info-card">
+              <h3>Borrowing Statistics</h3>
+              <div class="info-row">
+                <span class="info-label">Currently Borrowed:</span>
+                <span class="info-value stat-value">{{ selectedMemberDetails()!.currentlyBorrowed }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Total Borrowed:</span>
+                <span class="info-value stat-value">{{ selectedMemberDetails()!.totalBorrowed }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Returned:</span>
+                <span class="info-value stat-value">{{ selectedMemberDetails()!.returned }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Overdue:</span>
+                <span class="info-value stat-value" [class.overdue-text]="selectedMemberDetails()!.overdue > 0">
+                  {{ selectedMemberDetails()!.overdue }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Borrowing History -->
+          <div class="history-section">
+            <h3>Borrowing History</h3>
+            <p class="history-subtitle">Recent borrowing activity for this user</p>
+
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Book ID</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (record of selectedMemberDetails()!.borrowingHistory; track $index) {
+                    <tr>
+                      <td class="book-id">{{ record.bookId }}</td>
+                      <td>{{ formatDate(record.borrowDate) }}</td>
+                      <td>{{ formatDate(record.dueDate) }}</td>
+                      <td>{{ record.returnDate ? formatDate(record.returnDate) : '-' }}</td>
+                      <td>
+                        <span class="status-badge-history" 
+                              [class.status-overdue]="record.status === 'Overdue'"
+                              [class.status-returned]="record.status === 'Returned'"
+                              [class.status-borrowed]="record.status === 'Borrowed'">
+                          {{ record.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="no-history">No borrowing history</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

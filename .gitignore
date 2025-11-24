@@ -1,0 +1,48 @@
+# Presentation materials (personal use only - NOT for submission)
+ONLINE_DEMO_GUIDE.md
+DEMO_CHEAT_SHEET.md
+PRESENTATION_DEMO_SCRIPT.md
+PRESENTATION_SLIDES_OUTLINE.md
+QUICK_DEMO_CHECKLIST.md
+TEACHER_EVALUATION_DOCUMENT.md
+README_PRESENTATION_PACKAGE.md
+convert_to_gdocs.sh
+
+# Node modules
+**/node_modules/
+node_modules/
+
+# Environment files
+**/.env
+**/.env.local
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+*/.DS_Store
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# Build outputs
+**/dist/
+**/build/
+dist/
+build/
+frontend/.angular/
+
+# Logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker volumes
+**/data/
+data/

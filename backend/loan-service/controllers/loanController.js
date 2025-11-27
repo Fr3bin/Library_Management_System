@@ -297,3 +297,69 @@ exports.renewLoan = async (req, res) => {
     });
   }
 };
+
+// Get current user's active loans
+exports.getMyCurrentLoans = async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User ID not found in request'
+      });
+    }
+
+    const loans = await Loan.find({ userId, status: 'active' }).sort({ dueDate: 1 });
+
+    // Update overdue status
+    for (let loan of loans) {
+      if (loan.isOverdue()) {
+        loan.status = 'overdue';
+        await loan.save();
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      count: loans.length,
+      loans
+    });
+  } catch (error) {
+    console.error('Get my current loans error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching current loans',
+      error: error.message
+    });
+  }
+};
+
+// Get current user's loan history
+exports.getMyLoanHistory = async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User ID not found in request'
+      });
+    }
+
+    const loans = await Loan.find({ userId }).sort({ borrowDate: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: loans.length,
+      loans
+    });
+  } catch (error) {
+    console.error('Get my loan history error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching loan history',
+      error: error.message
+    });
+  }
+};

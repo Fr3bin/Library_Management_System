@@ -74,15 +74,21 @@ app.patch('/api/catalog/books/:id/availability', proxyRequest(CATALOG_SERVICE));
 
 // Protected loan routes (require authentication)
 app.post('/api/loans/borrow', authenticate, proxyRequest(LOAN_SERVICE));
-app.post('/api/loans/return/:id', authenticate, proxyRequest(LOAN_SERVICE));
-app.post('/api/loans/renew/:id', authenticate, proxyRequest(LOAN_SERVICE));
+app.post('/api/loans/:id/return', authenticate, proxyRequest(LOAN_SERVICE));
+app.post('/api/loans/:id/renew', authenticate, proxyRequest(LOAN_SERVICE));
 
+// Current user's loans (uses x-user-id from auth middleware)
+app.get('/api/loans/my-loans', authenticate, proxyRequest(LOAN_SERVICE));
+app.get('/api/loans/history', authenticate, proxyRequest(LOAN_SERVICE));
+
+// Get loans by user ID
 app.get('/api/loans/user/:userId', authenticate, proxyRequest(LOAN_SERVICE));
 app.get('/api/loans/current/:userId', authenticate, proxyRequest(LOAN_SERVICE));
 
 // Admin/Librarian routes
 app.get('/api/loans/overdue', authenticate, authorize('admin', 'librarian'), proxyRequest(LOAN_SERVICE));
 app.get('/api/loans/all', authenticate, authorize('admin', 'librarian'), proxyRequest(LOAN_SERVICE));
+app.get('/api/loans', authenticate, authorize('admin', 'librarian'), proxyRequest(LOAN_SERVICE));
 
 // ==================== ADMIN AGGREGATION ROUTES ====================
 
@@ -91,13 +97,15 @@ app.get('/api/admin/stats', authenticate, authorize('admin', 'librarian'), async
   try {
     const axios = require('axios');
 
+    console.log('[Admin Stats] Fetching data from all services...');
+
     // Fetch data from all services
-    const [booksRes, usersRes, loansRes, overdueRes] = await Promise.all([
+    const [booksRes, usersRes, allLoansRes, overdueRes] = await Promise.all([
       axios.get(`${CATALOG_SERVICE}/api/catalog/books`),
       axios.get(`${AUTH_SERVICE}/api/auth/users`, {
         headers: { authorization: req.headers.authorization }
       }),
-      axios.get(`${LOAN_SERVICE}/api/loans/all?status=active`, {
+      axios.get(`${LOAN_SERVICE}/api/loans/all`, {
         headers: { authorization: req.headers.authorization }
       }),
       axios.get(`${LOAN_SERVICE}/api/loans/overdue`, {
@@ -105,19 +113,50 @@ app.get('/api/admin/stats', authenticate, authorize('admin', 'librarian'), async
       })
     ]);
 
+    console.log('[Admin Stats] Books count:', booksRes.data.count);
+    console.log('[Admin Stats] Users count:', usersRes.data.count);
+    console.log('[Admin Stats] Loans count:', allLoansRes.data.count);
+    console.log('[Admin Stats] Overdue count:', overdueRes.data.count);
+
+    // Calculate active loans (currently borrowed books)
+    const allLoans = allLoansRes.data.loans || [];
+    const activeLoans = allLoans.filter(loan => 
+      loan.status === 'active' || loan.status === 'overdue'
+    );
+
+    // Calculate available books
+    const books = booksRes.data.books || [];
+    const availableBooks = books.filter(book => 
+      book.status === 'Available' && book.availableCopies > 0
+    ).length;
+
+    // Filter active users (students/members only, not admins)
+    const users = usersRes.data.users || [];
+    const activeMembers = users.filter(u => 
+      u.status === 'active' && (u.role === 'student' || u.role === 'member')
+    ).length;
+
+    // Count unique active borrowers
+    const uniqueBorrowers = new Set(activeLoans.map(loan => loan.userId)).size;
+
     const stats = {
       totalBooks: booksRes.data.count || 0,
-      activeUsers: usersRes.data.users?.filter(u => u.status === 'active').length || 0,
-      booksBorrowed: loansRes.data.count || 0,
-      overdueBooks: overdueRes.data.count || 0
+      availableBooks: availableBooks,
+      activeUsers: activeMembers,
+      booksBorrowed: activeLoans.length,
+      overdueBooks: overdueRes.data.count || 0,
+      activeBorrowers: uniqueBorrowers,
+      totalMembers: activeMembers
     };
+
+    console.log('[Admin Stats] Calculated stats:', stats);
 
     res.status(200).json({
       success: true,
       stats
     });
   } catch (error) {
-    console.error('Stats aggregation error:', error.message);
+    console.error('[Admin Stats] Error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Error fetching dashboard stats',

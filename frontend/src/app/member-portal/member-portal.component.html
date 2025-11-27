@@ -1,0 +1,159 @@
+<div class="member-portal">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="6" height="16" fill="#7c3aed"/>
+          <rect x="11" y="4" width="6" height="16" fill="#7c3aed"/>
+          <rect x="18" y="4" width="2" height="16" fill="#7c3aed"/>
+        </svg>
+      </div>
+      <div class="header-title">
+        <h1>Library Management System</h1>
+        <p class="subtitle">Member Portal</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <svg class="user-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <div class="user-details">
+          <div class="user-name">{{ member()?.name || 'User' }}</div>
+          <div class="user-email">{{ member()?.email || '' }}</div>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Stats Cards - Always visible -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Books Borrowed</span>
+          <svg class="stat-icon book-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats().currentlyBorrowed }}</div>
+        <div class="stat-label">Currently borrowed</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Total Borrowed</span>
+          <svg class="stat-icon clock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats().totalBorrowed }}</div>
+        <div class="stat-label">All time</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Returned Books</span>
+          <svg class="stat-icon check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="stat-value">{{ stats().booksReturned }}</div>
+        <div class="stat-label">Successfully returned</div>
+      </div>
+    </div>
+
+    <!-- Borrowed Books Section - Always visible -->
+    <div class="borrowed-books-section">
+      <div class="section-header">
+        <h2>Currently Borrowed Books</h2>
+        <p class="section-subtitle">Books you have currently borrowed</p>
+      </div>
+
+      <div class="books-list">
+        @for (book of borrowedBooks(); track book.id) {
+          <div class="book-card">
+            <div class="book-info">
+              <h3 class="book-title">{{ book.title }}</h3>
+              <p class="book-author">by {{ book.author }}</p>
+              <div class="book-meta">
+                <span class="genre-badge">{{ book.genre }}</span>
+                <span class="due-date">Due: {{ formatDate(book.dueDate) }}</span>
+              </div>
+            </div>
+            <button class="return-btn" (click)="returnBook(book.id)">
+              Return Book
+            </button>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No books currently borrowed</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+      <button 
+        class="tab" 
+        [class.active]="activeTab === 'overview'"
+        (click)="setActiveTab('overview')">
+        Overview
+      </button>
+      <button 
+        class="tab search-tab" 
+        [class.active]="activeTab === 'search'"
+        (click)="setActiveTab('search')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        Search Books
+      </button>
+      <button 
+        class="tab" 
+        [class.active]="activeTab === 'history'"
+        (click)="setActiveTab('history')">
+        Borrowing History
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    @if (activeTab === 'overview') {
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <h2>Welcome, {{ member()?.name || 'User' }}!</h2>
+        @if (member()?.memberSince) {
+          <p class="member-since">Member since {{ getMemberSinceDate() }}</p>
+        }
+        <p class="info-text">
+          Use the tabs above to search for books or view your borrowing history. 
+          You can borrow up to 5 books at a time for 14 days each.
+        </p>
+      </div>
+    }
+
+    @if (activeTab === 'search') {
+      <app-search-books />
+    }
+
+    @if (activeTab === 'history') {
+      <app-borrowing-history />
+    }
+  </main>
+</div>

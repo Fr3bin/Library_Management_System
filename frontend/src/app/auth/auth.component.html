@@ -1,0 +1,170 @@
+<div class="auth-container">
+  <!-- Logo and Header (outside the card) -->
+  <div class="auth-header">
+    <div class="logo">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="25" fill="#7c3aed"/>
+        <g transform="translate(17, 15)">
+          <rect x="2" y="2" width="3" height="18" fill="white" rx="1"/>
+          <rect x="7" y="2" width="3" height="18" fill="white" rx="1"/>
+          <rect x="12" y="2" width="3" height="18" fill="white" rx="1"/>
+        </g>
+      </svg>
+    </div>
+    <h1>Library Management System</h1>
+    <p class="subtitle">Manage your library collection and borrowing with ease</p>
+  </div>
+
+  <div class="auth-card">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        [class.active]="activeTab() === 'login'"
+        (click)="setActiveTab('login')"
+        class="tab-button">
+        Login
+      </button>
+      <button 
+        [class.active]="activeTab() === 'register'"
+        (click)="setActiveTab('register')"
+        class="tab-button">
+        Register
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    @if (activeTab() === 'login') {
+      <div class="form-container">
+        <div class="form-header">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          <h2>Login</h2>
+        </div>
+        <p class="form-description">Enter your credentials to access the library system</p>
+
+        @if (errorMessage()) {
+          <div class="error-message" style="background-color: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #c33;">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <form (ngSubmit)="onLogin()">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input 
+              type="email" 
+              id="login-email"
+              [(ngModel)]="loginEmail"
+              name="loginEmail"
+              placeholder="Enter your email"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input 
+              type="password" 
+              id="login-password"
+              [(ngModel)]="loginPassword"
+              name="loginPassword"
+              placeholder="Enter your password"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <button type="submit" class="submit-button" [disabled]="loading()">
+            @if (loading()) {
+              <span>Logging in...</span>
+            } @else {
+              <span>Login</span>
+            }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- Register Form -->
+    @if (activeTab() === 'register') {
+      <div class="form-container">
+        <div class="form-header">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+          <h2>Register</h2>
+        </div>
+        <p class="form-description">Create a new account to access the library system</p>
+
+        @if (errorMessage()) {
+          <div class="error-message" style="background-color: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #c33;">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <form (ngSubmit)="onRegister()">
+          <div class="form-group">
+            <label for="register-fullname">Full Name</label>
+            <input 
+              type="text" 
+              id="register-fullname"
+              [(ngModel)]="registerFullName"
+              name="registerFullName"
+              placeholder="Enter your full name"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="register-email">Email</label>
+            <input 
+              type="email" 
+              id="register-email"
+              [(ngModel)]="registerEmail"
+              name="registerEmail"
+              placeholder="Enter your email"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <input 
+              type="password" 
+              id="register-password"
+              [(ngModel)]="registerPassword"
+              name="registerPassword"
+              placeholder="Create a password (min 6 characters)"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="register-confirm-password">Confirm Password</label>
+            <input 
+              type="password" 
+              id="register-confirm-password"
+              [(ngModel)]="registerConfirmPassword"
+              name="registerConfirmPassword"
+              placeholder="Confirm your password"
+              [disabled]="loading()"
+              required>
+          </div>
+
+          <button type="submit" class="submit-button" [disabled]="loading()">
+            @if (loading()) {
+              <span>Creating account...</span>
+            } @else {
+              <span>Register</span>
+            }
+          </button>
+        </form>
+      </div>
+    }
+  </div>
+</div>

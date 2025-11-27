@@ -1,6 +1,8 @@
-# Library Management System
+# 📚 Library Management System
 
 A comprehensive microservices-based library management system built with Angular and Node.js.
+
+> **🚀 New here?** Start with the [Quick Start Guide](QUICK_START.md) for a fast setup!
 
 ## 🏗️ Architecture
 
@@ -87,8 +89,10 @@ All services are accessible through the API Gateway at `http://localhost:8000/ap
 
 ## 📖 Documentation
 
-- **SRS_Document.md**: Complete Software Requirements Specification (IEEE 830-1998 standard)
-- **COMPLETE_SETUP_GUIDE.md**: Detailed setup instructions, API documentation, and troubleshooting
+- **[SETUP_GUIDE.md](SETUP_GUIDE.md)**: **👉 START HERE** - Complete setup guide for first-time users
+- **[SYSTEM_ARCHITECTURE_AND_FIXES.md](SYSTEM_ARCHITECTURE_AND_FIXES.md)**: Technical documentation and troubleshooting
+- **SRS_Document.md**: Software Requirements Specification (IEEE 830-1998 standard)
+- **COMPLETE_SETUP_GUIDE.md**: Detailed setup instructions and API documentation
 - **backend/DATABASE_GUIDE.md**: MongoDB queries and database maintenance guide
 
 ## 🔧 Troubleshooting
